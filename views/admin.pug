@@ -1,0 +1,160 @@
+extends layout
+
+block maincss
+  link(rel="stylesheet",href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/css/bootstrap.min.css")
+  link(rel="stylesheet", href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker3.min.css")
+  
+
+  style.
+    .datepicker .table-condensed {
+      display : block;
+      padding : 10px
+    }
+    .datepicker .table-condensed thead{
+      background-color: #f9fafd;
+    }
+    .bootstrap-datetimepicker-widget{
+      padding:0px
+    }
+    .table-condensed > thead > tr > th, .table-condensed > thead > tr > td, .table-condensed > tbody > tr > th, .table-condensed > tbody > tr > td, .table-condensed > tfoot > tr > th, .table-condensed > tfoot > tr > td {
+        padding: 5px;
+        text-align:center;
+    }
+    .picker-switch{
+      text-align:center;
+    }
+    .bootstrap-datetimepicker-widget .list-unstyled{
+      margin:0px
+    }
+    .datepicker table tr td.active.active{
+      background-color: #3d9b0b !important;
+      background-image: none;
+      color:#fff
+    }
+    th.prev:before{
+      content:'«';
+      cursor : 'pointer'
+    }
+    th.next:before{
+      content:'»';
+      cursor : 'pointer'
+    }
+    .datepicker .datepicker-switch {
+      font-weight: bold;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .th{
+      font-size: 10px;
+      color: #8c94a5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 15px 15px;
+      font-weight:bold;
+    }
+    .td{
+      padding: 15px 15px 2px 0px;
+      color:rgb(33, 37, 41);
+      font-size: 13px;
+      font-weight:normal;
+    }
+    .callinfo td, .callinfo th{
+      padding:10px;
+    }
+
+block menu
+block header
+block append scripts
+  script(
+    src="https://code.jquery.com/jquery-2.1.4.min.js"
+  )
+  script(
+    src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
+  )
+  script(
+    src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js"
+  )
+  script(
+    src='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.15.35/js/bootstrap-datetimepicker.min.js'
+  )
+  script.
+    $(document).ready(function(){
+      $('#callsstartdate,#callsenddate').datetimepicker({
+        format: 'MM/DD/YYYY'
+      })
+      
+      $('#showCalls').click(function(){
+        var url = location.pathname + '?bid=#{bid}&sessionId=#{sessionId}'
+        var rangeBeg = $('#callsstartdate').data("DateTimePicker").viewDate().valueOf();
+        var rangeEnd = $('#callsenddate').data("DateTimePicker").viewDate().valueOf();
+        if (rangeBeg){
+          url = url + '&rangeBeg=' + rangeBeg
+        }
+        if (rangeEnd){
+          url = url + '&rangeEnd=' + rangeEnd
+        }
+        
+        location.href = url
+      })
+      
+    })
+
+block content_container
+  .container-fluid.mmg-iframe-content.call-details
+    .container-fluid#filters
+              
+      .row(style="padding-top: 20px; padding-bottom: 40px;")
+        .col-sm-5(style="padding-top:20px")
+            .fg-line(style="position:relative")
+                .input-group.date#callsstartdates
+                    input#callsstartdate.form-control(value=begDate)
+                    span.input-group-addon(style="background-color:#fff;border-bottom-color:rgb(224, 224, 224);border-radius:0px")
+                        i.fa.fa-calendar
+                        
+        .col-sm-5(style="padding-top:20px")
+            .fg-line(style="position:relative")
+                .input-group.date#callsenddates
+                    input#callsenddate.form-control(value=endDate)
+                    span.input-group-addon(style="background-color:#fff;border-bottom-color:rgb(224, 224, 224);border-radius:0px")
+                        i.fa.fa-calendar
+      
+        .col-lg-2
+          button#showCalls.btn.btn-info(style="float:right") View Leads
+              
+       
+
+
+      div(style="padding-top:20px")
+        h3(style="text-align:left;width:30%") Phone Leads
+        br
+        
+        table.callinfo.all-calls-datatable.table-layout2.dataTable#calllist(style="width:100%")
+          thead
+            tr
+              th Campaign  
+              th Date
+              th Phone Number
+              th Duration (seconds)
+              td 
+              
+          tbody
+            each lead, index in leads
+              -const campaign = campaigns.find(c=>c._id == lead.campaign_id)
+              tr(lead_id=lead._id, bid=bid)
+                  
+                  td
+                    span= campaign.name
+                  td
+                    span= moment(new Date(lead.created)).format('L')
+                  td
+                    span= lead.caller_id
+                  td
+                    span= lead.duration
+                  td
+                    if lead.has_recording
+                      a(href=`/download?call_id=${lead.call_id}&bid=${bid}&sessionId=${sessionId}`) Download
+
+
+
+
+block footer
