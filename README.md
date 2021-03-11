@@ -17,5 +17,5 @@ sls offline start
 5. Enter the url of your serverless url (local or cloud) as the admin dashboard url in your MMG account.
 6. Click on your dashboard's app link in MMG portal to see your app running.
 
-
+You can also see other examples in the examples folder.
 
